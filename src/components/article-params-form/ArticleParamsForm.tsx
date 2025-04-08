@@ -1,9 +1,9 @@
-import { ArrowButton } from '../../ui/arrow-button';
-import { Text } from '../../ui/text';
-import { Select } from '../../ui/select';
-import { RadioGroup } from '../../ui/radio-group';
-import { Separator } from '../../ui/separator';
-import { Button } from '../../ui/button';
+import { ArrowButton } from 'src/ui/arrow-button';
+import { Text } from 'src/ui/text';
+import { Select } from 'src/ui/select';
+import { RadioGroup } from 'src/ui/radio-group';
+import { Separator } from 'src/ui/separator';
+import { Button } from 'src/ui/button';
 import { useState, useEffect, FormEvent, useRef } from 'react';
 import {
 	fontFamilyOptions,
