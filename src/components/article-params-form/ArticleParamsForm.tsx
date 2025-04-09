@@ -49,7 +49,7 @@ export const ArticleParamsForm = ({
 	}
 
 	function handleToggleForm() {
-		setIsFormOpen((prev) => !prev);
+		setIsFormOpen((form) => !form);
 	}
 
 	function handleFontFamilyOption(value: OptionType) {
