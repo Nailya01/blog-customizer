@@ -4,7 +4,7 @@ import { Select } from 'src/ui/select';
 import { RadioGroup } from 'src/ui/radio-group';
 import { Separator } from 'src/ui/separator';
 import { Button } from 'src/ui/button';
-import { useState, useEffect, FormEvent, useRef } from 'react';
+import { useState, FormEvent, useRef } from 'react';
 import {
 	fontFamilyOptions,
 	fontColors,
@@ -17,43 +17,7 @@ import {
 } from 'src/constants/articleProps';
 import clsx from 'clsx';
 import styles from './ArticleParamsForm.module.scss';
-
-type TUseClose = {
-	form: boolean;
-	onClose: () => void;
-	rootRef: React.RefObject<HTMLElement>;
-};
-
-export function useClose({ form, onClose, rootRef }: TUseClose) {
-	useEffect(() => {
-		if (!form) return;
-
-		function handleClickOutside(event: MouseEvent) {
-			const { target } = event;
-			const isOutsideClick =
-				target instanceof Node &&
-				rootRef.current &&
-				!rootRef.current.contains(target);
-			if (isOutsideClick) {
-				onClose();
-			}
-		}
-
-		const handleEscape = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
-				onClose();
-			}
-		};
-
-		document.addEventListener('keydown', handleEscape);
-		document.addEventListener('mousedown', handleClickOutside);
-
-		return () => {
-			document.removeEventListener('keydown', handleEscape);
-			document.removeEventListener('mousedown', handleClickOutside);
-		};
-	}, [form, onClose, rootRef]);
-}
+import { useClose } from 'src/hooks/useClose';
 
 type ArticleParamsFormProps = {
 	defaultArticle: ArticleStateType;
@@ -64,62 +28,64 @@ export const ArticleParamsForm = ({
 	defaultArticle,
 	setDefaultArticle,
 }: ArticleParamsFormProps) => {
-	const [form, setForm] = useState(false);
-	const [state, setState] = useState(defaultArticle);
+	const [isFormOpen, setIsFormOpen] = useState(false);
+	const [articleParams, setArticleParams] = useState(defaultArticle);
 	const ref = useRef<HTMLFormElement | null>(null);
 
 	useClose({
-		form,
-		onClose: () => setForm(false),
+		isFormOpen,
+		onClose: () => setIsFormOpen(false),
 		rootRef: ref,
 	});
 
 	function submitSidebar(event: FormEvent) {
 		event.preventDefault();
-		setDefaultArticle(state);
+		setDefaultArticle(articleParams);
 	}
 
 	function resetSidebar() {
-		setState(defaultArticleState);
+		setArticleParams(defaultArticleState);
 		setDefaultArticle(defaultArticleState);
 	}
 
 	function handleToggleForm() {
-		setForm((form) => !form);
+		setIsFormOpen((prev) => !prev);
 	}
 
 	function handleFontFamilyOption(value: OptionType) {
-		setState({ ...state, fontFamilyOption: value });
+		setArticleParams({ ...articleParams, fontFamilyOption: value });
 	}
 
 	function handleFontSizeOptions(value: OptionType) {
-		setState({ ...state, fontSizeOption: value });
+		setArticleParams({ ...articleParams, fontSizeOption: value });
 	}
 
 	function handleFontColorOptions(value: OptionType) {
-		setState({ ...state, fontColor: value });
+		setArticleParams({ ...articleParams, fontColor: value });
 	}
 
 	function handleBackgroundColorOptions(value: OptionType) {
-		setState({ ...state, backgroundColor: value });
+		setArticleParams({ ...articleParams, backgroundColor: value });
 	}
 
 	function handleContentWidthOptions(value: OptionType) {
-		setState({ ...state, contentWidth: value });
+		setArticleParams({ ...articleParams, contentWidth: value });
 	}
 
 	return (
 		<>
-			<ArrowButton isOpen={form} onClick={handleToggleForm} />
+			<ArrowButton isOpen={isFormOpen} onClick={handleToggleForm} />
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: form })}>
+				className={clsx(styles.container, {
+					[styles.container_open]: isFormOpen,
+				})}>
 				<form
 					className={styles.form}
 					onSubmit={submitSidebar}
 					onReset={resetSidebar}
 					ref={ref}>
 					<Text
-						as='h1'
+						as='h2'
 						size={31}
 						weight={800}
 						fontStyle='normal'
@@ -129,7 +95,7 @@ export const ArticleParamsForm = ({
 						Задайте параметры
 					</Text>
 					<Select
-						selected={state.fontFamilyOption}
+						selected={articleParams.fontFamilyOption}
 						options={fontFamilyOptions}
 						title='Шрифт'
 						onChange={handleFontFamilyOption}
@@ -137,25 +103,25 @@ export const ArticleParamsForm = ({
 					<RadioGroup
 						name='font-size'
 						options={fontSizeOptions}
-						selected={state.fontSizeOption}
+						selected={articleParams.fontSizeOption}
 						onChange={handleFontSizeOptions}
 						title='Размер шрифта'
 					/>
 					<Select
-						selected={state.fontColor}
+						selected={articleParams.fontColor}
 						options={fontColors}
 						title='Цвет шрифта'
 						onChange={handleFontColorOptions}
 					/>
 					<Separator />
 					<Select
-						selected={state.backgroundColor}
+						selected={articleParams.backgroundColor}
 						options={backgroundColors}
 						title='Цвет фона'
 						onChange={handleBackgroundColorOptions}
 					/>
 					<Select
-						selected={state.contentWidth}
+						selected={articleParams.contentWidth}
 						options={contentWidthArr}
 						title='Ширина контента'
 						onChange={handleContentWidthOptions}
